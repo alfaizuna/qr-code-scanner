@@ -23,7 +23,6 @@ function App() {
     const handleConfirm = () => {
         Swal.fire({
             title: "Confirmation Successful!",
-            text: `Nama: ${name}\nJumlah Orang: ${jumlahOrang}`,
             icon: "success",
             confirmButtonText: "OK",
         }).then(() => {
