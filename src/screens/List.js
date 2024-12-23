@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import * as XLSX from "xlsx";
+import Swal from "sweetalert2";
 
 function List() {
     const [data, setData] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
+    const [searchTerm, setSearchTerm] = useState(""); // Search term
+    const [newGuest, setNewGuest] = useState({ nama: "", jumlah_orang: "" }); // New guest form
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [page, setPage] = useState(1); // Current page
@@ -23,6 +28,7 @@ function List() {
                 }
             );
             setData(response.data.data);
+            setFilteredData(response.data.data); // Initialize filtered data
             setPage(response.data.page);
             setTotalPages(response.data.totalPages);
         } catch (err) {
@@ -35,6 +41,56 @@ function List() {
     useEffect(() => {
         fetchData(page);
     }, [page]);
+
+    // Search handler
+    const handleSearch = (e) => {
+        const term = e.target.value;
+        setSearchTerm(term);
+        setFilteredData(
+            data.filter((item) =>
+                item.nama.toLowerCase().includes(term.toLowerCase())
+            )
+        );
+    };
+
+    // Add new guest handler
+    const handleAddGuest = async (e) => {
+        e.preventDefault();
+        if (!newGuest.nama || !newGuest.jumlah_orang) {
+            alert("Please fill in all fields");
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem("token"); // Retrieve the token for authorization
+            const response = await axios.post(
+                "http://localhost:4000/save-scanner-data",
+                newGuest,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+
+            if (response.status === 201) {
+                await Swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "Guest added successfully!",
+                    timer: 2000,
+                    showConfirmButton: false,
+                });
+
+                setIsModalOpen(false); // Close the modal
+                fetchData(page); // Refresh the data to reflect the new entry
+            }
+        } catch (err) {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: err.response?.data?.error || "Failed to add guest.",
+            });
+        }
+    };
 
     // Download data as Excel
     const downloadExcel = () => {
@@ -121,9 +177,28 @@ function List() {
     return (
         <div style={styles.container}>
             <h1 style={styles.title}>Daftar Tamu</h1>
+            {/* Search and Download Controls */}
+            <div style={styles.controls}>
+                <button
+                    style={styles.addButton}
+                    onClick={() => setIsModalOpen(true)}
+                >
+                    Add Guest
+                </button>
+                <input
+                    type="text"
+                    placeholder="Search by name..."
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    style={styles.searchInput}
+                />
+            </div>
+
             <button style={styles.downloadButton} onClick={downloadExcel}>
                 Download Excel
             </button>
+
+            {/* Table */}
             <table style={styles.table}>
                 <thead>
                 <tr>
@@ -134,17 +209,20 @@ function List() {
                 </tr>
                 </thead>
                 <tbody>
-                {data.map((item, index) => (
+                {filteredData.map((item, index) => (
                     <tr key={item.id}>
-                        <td style={styles.td}>{index+1}</td>
+                        <td style={styles.td}>{index + 1}</td>
                         <td style={styles.td}>{item.nama}</td>
                         <td style={styles.td}>{item.jumlah_orang}</td>
                         <td style={styles.td}>
-                            {new Date(item.created_date).toLocaleTimeString("en-US", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                hour12: false,
-                            })}
+                            {new Date(item.created_date).toLocaleTimeString(
+                                "en-US",
+                                {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    hour12: false,
+                                }
+                            )}
                         </td>
                     </tr>
                 ))}
@@ -171,63 +249,124 @@ function List() {
                     Next
                 </button>
             </div>
+
+            {/* Modal for Add Guest */}
+            {isModalOpen && (
+                <div style={styles.modal}>
+                    <div style={styles.modalContent}>
+                        <h2 style={styles.modalTitle}>Add Guest</h2>
+                        <form onSubmit={handleAddGuest}>
+                            <input
+                                type="text"
+                                placeholder="Nama"
+                                value={newGuest.nama}
+                                onChange={(e) =>
+                                    setNewGuest({
+                                        ...newGuest,
+                                        nama: e.target.value,
+                                    })
+                                }
+                                style={styles.modalInput}
+                            />
+                            <input
+                                type="number"
+                                placeholder="Jumlah Orang"
+                                value={newGuest.jumlah_orang}
+                                onChange={(e) =>
+                                    setNewGuest({
+                                        ...newGuest,
+                                        jumlah_orang: e.target.value,
+                                    })
+                                }
+                                style={styles.modalInput}
+                            />
+                            <div style={styles.modalActions}>
+                                <button type="submit" style={styles.modalButton}>
+                                    Add
+                                </button>
+                                <button
+                                    type="button"
+                                    style={styles.modalButtonCancel}
+                                    onClick={() => setIsModalOpen(false)}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
 
 const styles = {
-    container: {
-        padding: "20px",
-    },
-    title: {
-        fontSize: "24px",
-        marginBottom: "20px",
+    container: {padding: "20px"},
+    title: {fontSize: "24px", marginBottom: "20px"},
+    controls: { display: "flex", gap: "10px", marginBottom: "20px", width: "100%" },
+    searchInput: {
+        padding: "10px",
+        border: "1px solid #ccc",
+        borderRadius: "5px",
+        flex: "1",
     },
     downloadButton: {
-        marginBottom: "20px",
         padding: "10px 20px",
         backgroundColor: "#007bff",
         color: "#fff",
         border: "none",
         borderRadius: "5px",
-        cursor: "pointer",
+        height: "40px", // Match height with the search input
+        marginTop: "-30px",
+        marginBottom: "10px",
     },
-    table: {
+    addButton: {
+        padding: "10px 20px",
+        backgroundColor: "#28a745",
+        color: "#fff",
+        border: "none",
+        borderRadius: "5px",
+        height: "40px", // Match height with the search input
+    },
+    table: { width: "100%", borderCollapse: "collapse" },
+    th: { border: "1px solid #ddd", padding: "8px", backgroundColor: "#f8f9fa" },
+    td: { border: "1px solid #ddd", padding: "8px", textAlign: "center" },
+    pagination: { display: "flex", justifyContent: "center", marginTop: "20px" },
+    paginationButton: { padding: "10px 20px", margin: "0 5px", borderRadius: "5px" },
+    pageInfo: { margin: "0 10px" },
+    modal: {
+        position: "fixed",
+        top: 0,
+        left: 0,
         width: "100%",
-        borderCollapse: "collapse",
-    },
-    th: {
-        backgroundColor: "#f8f9fa",
-        fontWeight: "bold",
-        border: "1px solid #ddd",
-        padding: "8px",
-    },
-    td: {
-        border: "1px solid #ddd",
-        padding: "8px",
-        textAlign: "center",
-    },
-    pagination: {
+        height: "100%",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        marginTop: "20px",
     },
-    paginationButton: {
-        padding: "10px 20px",
-        margin: "0 5px",
-        backgroundColor: "#007bff",
-        color: "#fff",
-        border: "none",
+    modalContent: {
+        backgroundColor: "#fff",
+        padding: "20px",
         borderRadius: "5px",
-        cursor: "pointer",
-        disabled: {
-            backgroundColor: "#ccc",
-            cursor: "not-allowed",
-        },
+        width: "400px",
+        textAlign: "center",
     },
-    pageInfo: {
-        margin: "0 10px",
+    modalTitle: { marginBottom: "20px" },
+    modalInput: {
+        display: "block",
+        width: "100%",
+        padding: "10px",
+        marginBottom: "10px",
+        border: "1px solid #ccc",
+        borderRadius: "5px",
+    },
+    modalActions: { display: "flex", justifyContent: "space-between" },
+    modalButton: { padding: "10px 20px", backgroundColor: "#28a745", color: "#fff" },
+    modalButtonCancel: {
+        padding: "10px 20px",
+        backgroundColor: "#dc3545",
+        color: "#fff",
     },
 };
 
