@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./Login.css";
 import {useNavigate} from "react-router-dom";
@@ -33,6 +33,7 @@ const Login = ({ setToken, setRole }) => {
                 setRole(response.data.role);
                 localStorage.setItem("token", response.data.token);
                 localStorage.setItem("role", response.data.role);
+                localStorage.setItem("usercode", response.data.usercode);
                 setError("");
                 navigate("/");
             } else {

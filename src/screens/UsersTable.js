@@ -134,29 +134,24 @@ const UsersTable = () => {
 
     return (
         <div style={styles.container}>
-            <h1 style={styles.title}>Users Table</h1>
+            <h1 style={styles.title}>Customers</h1>
             <button onClick={() => openModal()} style={styles.addButton}>
-                Add User
+                Add Customer
             </button>
             <table style={styles.table}>
                 <thead>
                 <tr>
                     <th style={styles.th}>No</th>
                     <th style={styles.th}>Username</th>
-                    <th style={styles.th}>Role</th>
                     <th style={styles.th}>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 {users.map((user, index) => (
                     <tr key={user.id}>
-                        <td style={styles.th}>{index + 1}</td>
-                        <td style={styles.th}>{user.username}</td>
-                        <td style={styles.th}>{user.role}</td>
-                        <td style={styles.actions}>
-                            {/*<button onClick={() => openModal(user)} style={styles.editButton}>*/}
-                            {/*    Edit*/}
-                            {/*</button>*/}
+                        <td style={styles.td}>{index + 1}</td>
+                        <td style={styles.td}>{user.username}</td>
+                        <td style={styles.td}>
                             <button
                                 onClick={() => handleDeleteUser(user.id)}
                                 style={styles.deleteButton}
@@ -169,13 +164,13 @@ const UsersTable = () => {
                 </tbody>
             </table>
             <div style={styles.pagination}>
-                <button onClick={handlePrev} disabled={page === 1}>
+                <button style={{borderRadius: "5px"}} onClick={handlePrev} disabled={page === 1}>
                     Previous
                 </button>
                 <span>
                     Page {page} of {totalPages}
                 </span>
-                <button onClick={handleNext} disabled={page === totalPages}>
+                <button style={{borderRadius: "5px"}} onClick={handleNext} disabled={page === totalPages}>
                     Next
                 </button>
             </div>
@@ -183,7 +178,7 @@ const UsersTable = () => {
             {modalVisible && (
                 <div style={styles.modalOverlay}>
                     <div style={styles.modal}>
-                        <h2>{editUser ? "Edit User" : "Add User"}</h2>
+                        <h2>{editUser ? "Edit User" : "Add Customer"}</h2>
                         <input
                             type="text"
                             placeholder="Username"
@@ -192,7 +187,7 @@ const UsersTable = () => {
                             style={styles.input}
                         />
                         <input
-                            type="password"
+                            type="text"
                             placeholder="Password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -216,9 +211,9 @@ const UsersTable = () => {
 const styles = {
     container: { padding: "20px" },
     title: { fontSize: "24px", marginBottom: "20px" },
-    addButton: { padding: "10px", backgroundColor: "green", color: "#fff", border: "none", cursor: "pointer" },
+    addButton: { padding: "10px", backgroundColor: "green", color: "#fff", border: "none", cursor: "pointer", borderRadius: "5px", marginBottom:"20px"},
     table: { width: "100%", borderCollapse: "collapse" },
-    actions: { display: "flex", gap: "10px", border: "1px solid #ddd", padding: "8px", textAlign: "center" },
+    actions: { display: "flex", gap: "10px", border: "1px solid #ddd", padding: "12px", textAlign: "center" },
     editButton: { backgroundColor: "blue", color: "#fff", padding: "5px", cursor: "pointer" },
     deleteButton: { backgroundColor: "red", color: "#fff", padding: "5px", cursor: "pointer" },
     pagination: { marginTop: "20px", display: "flex", justifyContent: "space-between", alignItems: "center" },
