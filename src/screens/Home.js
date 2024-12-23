@@ -37,8 +37,7 @@ const Home = () => {
         <div style={styles.container}>
             <h1 style={styles.title}>Welcome</h1>
             <div style={{marginBottom:"20px"}}>
-                {/*<span>{usercode || "Not available"}</span>*/}
-                <span>Riri & Roni</span>
+                <span>{usercode || "Not available"}</span>
             </div>
             <div style={styles.card}>
                 <h2>Jumlah Tamu yang Hadir</h2>
