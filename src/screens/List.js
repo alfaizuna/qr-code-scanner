@@ -42,11 +42,71 @@ function List() {
             alert("No data available to download");
             return;
         }
-        const worksheet = XLSX.utils.json_to_sheet(data);
+
+        // Adjust timezone and format date
+        const adjustTimezone = (dateString, offset) => {
+            const date = new Date(dateString); // Parse the input date
+            const utc = date.getTime() + date.getTimezoneOffset() * 60000; // Convert to UTC
+            const localTime = new Date(utc + offset * 3600000); // Adjust for timezone offset
+            return localTime.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit"});
+        };
+
+        // Map the data to include the new 'jam kehadiran' field
+        const adjustedData = data.map((item, index) => {
+            const timezoneOffset = 7; // Default GMT+7, adjust as needed
+            const adjustedTime = adjustTimezone(item.created_date, timezoneOffset);
+            return {
+                No: index + 1,
+                ...item,
+                "jam kehadiran": adjustedTime, // Add the 'jam kehadiran' field
+            };
+        });
+
+        // Remove 'created_date' and keep the modified 'jam kehadiran'
+        const finalData = adjustedData.map(({ id, created_date, ...rest }) => rest);
+        const worksheet = XLSX.utils.json_to_sheet(finalData);
+
+        // Apply header styles
+        const range = XLSX.utils.decode_range(worksheet['!ref']);
+        for (let C = range.s.c; C <= range.e.c; ++C) {
+            const cellAddress = XLSX.utils.encode_cell({ r: 0, c: C });
+            if (!worksheet[cellAddress]) continue;
+
+            // Make header bold
+            worksheet[cellAddress].s = {
+                font: { bold: true }, // Set bold font
+                border: {
+                    top: { style: "thin" },
+                    bottom: { style: "thin" },
+                    left: { style: "thin" },
+                    right: { style: "thin" },
+                },
+            };
+        }
+
+        // Apply borders to all cells
+        for (let R = range.s.r; R <= range.e.r; ++R) {
+            for (let C = range.s.c; C <= range.e.c; ++C) {
+                const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+                if (!worksheet[cellAddress]) continue;
+
+                worksheet[cellAddress].s = {
+                    ...worksheet[cellAddress].s,
+                    border: {
+                        top: { style: "thin" },
+                        bottom: { style: "thin" },
+                        left: { style: "thin" },
+                        right: { style: "thin" },
+                    },
+                };
+            }
+        }
+
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Scanner Data");
-        XLSX.writeFile(workbook, "Scanner_Data.xlsx");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Daftar Tamu");
+        XLSX.writeFile(workbook, "daftar_tamu.xlsx");
     };
+
 
     // Handle page navigation
     const handlePageChange = (newPage) => {
