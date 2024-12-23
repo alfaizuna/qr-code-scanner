@@ -1,207 +1,87 @@
-import React, { useRef, useEffect } from "react";
-import Swal from "sweetalert2";
-import BarcodeScannerComponent from "react-qr-barcode-scanner";
+import React, { useState } from "react";
+import { BrowserRouter as Router, Route, Routes, Navigate, useNavigate } from "react-router-dom";
+import Home from "./screens/Home";
+import Scanner from "./screens/Scanner";
+import List from "./screens/List";
+import Login from "./screens/Login";
+import UsersTable from "./screens/UsersTable";
+import "./App.css";
 
 function App() {
-    const [data, setData] = React.useState("Not Found");
-    const [torchOn, setTorchOn] = React.useState(false);
-    const [showModal, setShowModal] = React.useState(false);
-    const [name, setName] = React.useState("");
-    const [jumlahOrang, setJumlahOrang] = React.useState("");
+    const [token, setToken] = useState(localStorage.getItem("token") || null);
+    const [role, setRole] = useState(localStorage.getItem("role") || null);
 
-    // Ref for the "Jumlah Orang" input
-    const jumlahOrangRef = useRef(null);
-
-    // Focus on the "Jumlah Orang" input when the modal is shown
-    useEffect(() => {
-        if (showModal && jumlahOrangRef.current) {
-            jumlahOrangRef.current.focus();
-        }
-    }, [showModal]);
-
-
-    const handleConfirm = () => {
-        Swal.fire({
-            title: "Confirmation Successful!",
-            icon: "success",
-            confirmButtonText: "OK",
-        }).then(() => {
-            // Reset fields after confirmation
-            setShowModal(false);
-            setData("Not Found");
-            setName("");
-            setJumlahOrang("");
-        });
+    const handleLogout = () => {
+        setToken(null);
+        setRole(null);
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
     };
 
-    const handleCancel = () => {
-        setShowModal(false);
-        setName("");
-        setJumlahOrang("");
-    };
+    if (!token) {
+        return (
+            <Router>
+                <Routes>
+                    <Route path="/login" element={<Login setToken={setToken} setRole={setRole} />} />
+                    <Route path="*" element={<Navigate to="/login" />} />
+                </Routes>
+            </Router>
+        );
+    }
 
     return (
-        <div style={styles.container}>
-            <h1 style={styles.title}>Undangan</h1>
-            <div style={styles.scannerWrapper}>
-                <BarcodeScannerComponent
-                    width="100%"
-                    height="auto"
-                    torch={torchOn}
-                    onUpdate={(err, result) => {
-                        if (result && result.text !== data) {
-                            setData(result.text);
-                            setName(result.text);
-                            setShowModal(true); // Show modal when a barcode is successfully scanned
-                        }
-                    }}
-                />
+        <Router>
+            <div className="app-container">
+                <Routes>
+                    {role === "admin" ? (
+                        <Route path="/" element={<UsersTable />} />
+                    ) : (
+                        <>
+                            <Route path="/" element={<Home />} />
+                            <Route path="/scanner" element={<Scanner />} />
+                            <Route path="/list" element={<List />} />
+                        </>
+                    )}
+                    <Route path="*" element={<Navigate to="/" />} />
+                </Routes>
+                <BottomBar handleLogout={handleLogout} isAdmin={role === "admin"} />
             </div>
-            <h3>Scan QR Code</h3>
-            <p>Pastikan <strong>QR Code</strong> tidak ketukar dan jelas kebaca.</p>
-            <div style={styles.controls}>
-                <button style={styles.button} onClick={() => setTorchOn(!torchOn)}>
-                    Switch Torch {torchOn ? "Off" : "On"}
-                </button>
-            </div>
+        </Router>
+    );
+}
 
-            {/* Modal */}
-            {showModal && (
-                <div style={styles.modalOverlay}>
-                    <div style={styles.modal}>
-                        <h2 style={styles.modalTitle}>Check In</h2>
-                        <div style={styles.inputGroup}>
-                            <label style={styles.label}>Nama:</label>
-                            <input
-                                style={styles.input}
-                                type="text"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                placeholder="Enter name"
-                            />
-                        </div>
-                        <div style={styles.inputGroup}>
-                            <label style={styles.label}>Jumlah Orang:</label>
-                            <input
-                                style={styles.input}
-                                type="tel"
-                                value={jumlahOrang}
-                                onChange={(e) => setJumlahOrang(e.target.value)}
-                                placeholder="Enter number of people"
-                                ref={jumlahOrangRef}
-                            />
-                        </div>
-                        <div style={styles.modalActions}>
-                            <button style={styles.button} onClick={handleConfirm}>
-                                Confirm
-                            </button>
-                            <button
-                                style={styles.cancelButton}
-                                onClick={handleCancel}
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                </div>
+function BottomBar({ handleLogout, isAdmin }) {
+    const navigate = useNavigate();
+
+    return (
+        <div className="bottom-bar">
+            {isAdmin ? (
+                <button onClick={handleLogout}>
+                    <span>🚪</span>
+                    <p>Logout</p>
+                </button>
+            ) : (
+                <>
+                    <button onClick={() => navigate("/")}>
+                        <span>🏠</span>
+                        <p>Home</p>
+                    </button>
+                    <button onClick={() => navigate("/scanner")}>
+                        <span>📷</span>
+                        <p>Scanner</p>
+                    </button>
+                    <button onClick={() => navigate("/list")}>
+                        <span>📋</span>
+                        <p>Daftar Tamu</p>
+                    </button>
+                    <button onClick={handleLogout}>
+                        <span>🚪</span>
+                        <p>Logout</p>
+                    </button>
+                </>
             )}
         </div>
     );
 }
-
-const styles = {
-    container: {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "10px",
-        maxWidth: "600px",
-        margin: "0 auto",
-    },
-    title: {
-        fontSize: "24px",
-        fontWeight: "bold",
-        marginBottom: "20px",
-        textAlign: "center",
-        color: "#333",
-    },
-    scannerWrapper: {
-        width: "100%",
-        maxWidth: "250px",
-        aspectRatio: "1 / 1",
-        overflow: "hidden",
-        borderRadius: "10px",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-    },
-    controls: {
-        marginTop: "20px",
-        textAlign: "center",
-    },
-    button: {
-        padding: "10px 20px",
-        fontSize: "16px",
-        borderRadius: "5px",
-        backgroundColor: "#007BFF",
-        color: "#fff",
-        border: "none",
-        cursor: "pointer",
-        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-    },
-    cancelButton: {
-        padding: "10px 20px",
-        fontSize: "16px",
-        borderRadius: "5px",
-        backgroundColor: "#DC3545",
-        color: "#fff",
-        border: "none",
-        cursor: "pointer",
-        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-        marginLeft: "10px",
-    },
-    modalOverlay: {
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    modal: {
-        backgroundColor: "#fff",
-        padding: "20px",
-        borderRadius: "10px",
-        width: "90%",
-        maxWidth: "400px",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-    },
-    modalTitle: {
-        fontSize: "20px",
-        fontWeight: "bold",
-        marginBottom: "15px",
-    },
-    inputGroup: {
-        marginBottom: "15px",
-    },
-    label: {
-        display: "block",
-        marginBottom: "5px",
-        fontWeight: "bold",
-    },
-    input: {
-        width: "100%",
-        padding: "8px",
-        fontSize: "16px",
-        borderRadius: "5px",
-        border: "1px solid #ccc",
-    },
-    modalActions: {
-        display: "flex",
-        justifyContent: "flex-end",
-    },
-};
 
 export default App;
