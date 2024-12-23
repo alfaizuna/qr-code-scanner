@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./Login.css";
 import {useNavigate} from "react-router-dom";
+import logo from "../assets/logo.png";
 
 const Login = ({ setToken, setRole }) => {
     const [formData, setFormData] = useState({ username: "", password: "" });
@@ -44,7 +45,12 @@ const Login = ({ setToken, setRole }) => {
     };
 
     return (
-        <div>
+        <div className="login-container">
+            <img
+                src={logo}
+                alt="Logo"
+                className="login-logo"
+            />
             <h1>Login</h1>
             <form onSubmit={handleSubmit}>
                 <input
@@ -65,7 +71,7 @@ const Login = ({ setToken, setRole }) => {
                 />
                 <button type="submit">Login</button>
             </form>
-            {error && <p style={{ color: "red" }}>{error}</p>}
+            {error && <p style={{color: "red"}}>{error}</p>}
         </div>
     );
 };
