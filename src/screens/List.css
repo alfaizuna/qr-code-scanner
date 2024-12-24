@@ -1,0 +1,46 @@
+/* General table styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background-color: #f8f9fa;
+}
+
+/* Responsive styles */
+@media screen and (max-width: 600px) {
+    table,
+    thead,
+    tbody,
+    th,
+    td,
+    tr {
+        display: block;
+    }
+
+    th {
+        display: none; /* Hide table headers */
+    }
+
+    td {
+        position: relative;
+        padding-left: 50%; /* Space for the labels */
+        text-align: left;
+    }
+
+    td::before {
+        content: attr(data-label); /* Display the label from the data-label attribute */
+        position: absolute;
+        left: 10px;
+        font-weight: bold;
+    }
+}

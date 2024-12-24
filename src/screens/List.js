@@ -9,11 +9,12 @@ function List() {
     const [searchTerm, setSearchTerm] = useState(""); // Search term
     const [newGuest, setNewGuest] = useState({ nama: "", jumlah_orang: "" }); // New guest form
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingGuest, setEditingGuest] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [page, setPage] = useState(1); // Current page
     const [totalPages, setTotalPages] = useState(1); // Total pages
-    const limit = 10; // Items per page
+    const limit = 5; // Items per page
 
     // Fetch paginated data
     const fetchData = async (page = 1) => {
@@ -53,6 +54,45 @@ function List() {
         );
     };
 
+    const handleEditGuest = async (e) => {
+        e.preventDefault();
+        if (!editingGuest.nama || !editingGuest.jumlah_orang) {
+            alert("Please fill in all fields");
+            return;
+        }
+        try {
+            const token = localStorage.getItem("token");
+            const response = await axios.put(
+                `http://localhost:4000/update-scanner-data/${editingGuest.id}`,
+                editingGuest,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            if (response.status === 200) {
+                await Swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "Guest updated successfully!",
+                    timer: 2000,
+                    showConfirmButton: false,
+                });
+                setEditingGuest(null);
+                fetchData(page);
+            }
+        } catch (err) {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: err.response?.data?.error || "Failed to update guest.",
+            });
+        }
+    };
+
+    const handleEditClick = (guest) => {
+        setEditingGuest(guest);
+    };
+
     // Add new guest handler
     const handleAddGuest = async (e) => {
         e.preventDefault();
@@ -79,7 +119,7 @@ function List() {
                     timer: 2000,
                     showConfirmButton: false,
                 });
-
+                setNewGuest({ nama: "", jumlah_orang: "" });
                 setIsModalOpen(false); // Close the modal
                 fetchData(page); // Refresh the data to reflect the new entry
             }
@@ -206,12 +246,13 @@ function List() {
                     <th style={styles.th}>Nama</th>
                     <th style={styles.th}>Jumlah Orang</th>
                     <th style={styles.th}>Jam Kedatangan</th>
+                    <th style={styles.th}>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 {filteredData.map((item, index) => (
                     <tr key={item.id}>
-                        <td style={styles.td}>{index + 1}</td>
+                        <td style={styles.td}>{(page - 1) * limit + index + 1}</td>
                         <td style={styles.td}>{item.nama}</td>
                         <td style={styles.td}>{item.jumlah_orang}</td>
                         <td style={styles.td}>
@@ -223,6 +264,14 @@ function List() {
                                     hour12: false,
                                 }
                             )}
+                        </td>
+                        <td style={styles.td}>
+                            <button
+                                style={styles.editButton}
+                                onClick={() => handleEditClick(item)}
+                            >
+                                Edit
+                            </button>
                         </td>
                     </tr>
                 ))}
@@ -288,6 +337,52 @@ function List() {
                                     type="button"
                                     style={styles.modalButtonCancel}
                                     onClick={() => setIsModalOpen(false)}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {editingGuest && (
+                <div style={styles.modal}>
+                    <div style={styles.modalContent}>
+                        <h2 style={styles.modalTitle}>Edit Guest</h2>
+                        <form onSubmit={handleEditGuest}>
+                            <input
+                                type="text"
+                                placeholder="Nama"
+                                value={editingGuest.nama}
+                                onChange={(e) =>
+                                    setEditingGuest({
+                                        ...editingGuest,
+                                        nama: e.target.value,
+                                    })
+                                }
+                                style={styles.modalInput}
+                            />
+                            <input
+                                type="number"
+                                placeholder="Jumlah Orang"
+                                value={editingGuest.jumlah_orang}
+                                onChange={(e) =>
+                                    setEditingGuest({
+                                        ...editingGuest,
+                                        jumlah_orang: e.target.value,
+                                    })
+                                }
+                                style={styles.modalInput}
+                            />
+                            <div style={styles.modalActions}>
+                                <button type="submit" style={styles.modalButton}>
+                                    Save
+                                </button>
+                                <button
+                                    type="button"
+                                    style={styles.modalButtonCancel}
+                                    onClick={() => setEditingGuest(null)}
                                 >
                                     Cancel
                                 </button>
@@ -367,6 +462,13 @@ const styles = {
         padding: "10px 20px",
         backgroundColor: "#dc3545",
         color: "#fff",
+    },
+    editButton: {
+        padding: "5px 10px",
+        backgroundColor: "#ffc107",
+        color: "#fff",
+        border: "none",
+        borderRadius: "5px",
     },
 };
 

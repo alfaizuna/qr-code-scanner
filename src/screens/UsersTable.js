@@ -9,12 +9,14 @@ const UsersTable = () => {
     const [editUser, setEditUser] = useState(null);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [usercode, setUsercode] = useState(""); // New state for usercode
+    const limit = 5;
 
     const fetchUsers = async (page) => {
         try {
             const token = localStorage.getItem("token");
             const response = await fetch(
-                `http://localhost:4000/get-users?page=${page}&limit=10`,
+                `http://localhost:4000/get-users?page=${page}&limit=${limit}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -25,7 +27,7 @@ const UsersTable = () => {
             if (response.ok) {
                 const { data, totalPages } = await response.json();
                 setUsers(data);
-                setTotalPages(totalPages);
+                setTotalPages(totalPages - 1);
             } else {
                 console.error("Failed to fetch users");
             }
@@ -50,6 +52,7 @@ const UsersTable = () => {
         setEditUser(user);
         setUsername(user ? user.username : "");
         setPassword("");
+        setUsercode(user ? user.usercode : ""); // Populate usercode for editing
         setModalVisible(true);
     };
 
@@ -58,6 +61,7 @@ const UsersTable = () => {
         setEditUser(null);
         setUsername("");
         setPassword("");
+        setUsercode(""); // Clear usercode
     };
 
     const handleSaveUser = async () => {
@@ -68,9 +72,14 @@ const UsersTable = () => {
                 : `http://localhost:4000/register`;
             const method = editUser ? "PUT" : "POST";
 
-            const body = { username, role: "customer" };
+            const body = {
+                username,
+                role: "customer", // Role is fixed to "customer" based on your UI logic
+                usercode, // Use the input value for usercode
+            };
+
             if (!editUser || password.trim() !== "") {
-                body.password = password; // Include password only for new user or if updated
+                body.password = password; // Include password only if provided
             }
 
             const response = await fetch(url, {
@@ -86,7 +95,9 @@ const UsersTable = () => {
                 fetchUsers(page);
                 closeModal();
             } else {
-                console.error("Failed to save user");
+                const errorData = await response.json();
+                console.error("Error saving user:", errorData.error);
+                alert(`Failed to save user: ${errorData.error}`);
             }
         } catch (error) {
             console.error("Error saving user:", error);
@@ -149,7 +160,7 @@ const UsersTable = () => {
                 <tbody>
                 {users.map((user, index) => (
                     <tr key={user.id}>
-                        <td style={styles.td}>{index + 1}</td>
+                        <td style={styles.td}>{(page - 1) * limit + index + 1}</td>
                         <td style={styles.td}>{user.username}</td>
                         <td style={styles.td}>
                             <button
@@ -164,13 +175,21 @@ const UsersTable = () => {
                 </tbody>
             </table>
             <div style={styles.pagination}>
-                <button style={{borderRadius: "5px"}} onClick={handlePrev} disabled={page === 1}>
+                <button
+                    style={{ borderRadius: "5px" }}
+                    onClick={handlePrev}
+                    disabled={page === 1}
+                >
                     Previous
                 </button>
                 <span>
                     Page {page} of {totalPages}
                 </span>
-                <button style={{borderRadius: "5px"}} onClick={handleNext} disabled={page === totalPages}>
+                <button
+                    style={{ borderRadius: "5px" }}
+                    onClick={handleNext}
+                    disabled={page === totalPages}
+                >
                     Next
                 </button>
             </div>
@@ -179,6 +198,13 @@ const UsersTable = () => {
                 <div style={styles.modalOverlay}>
                     <div style={styles.modal}>
                         <h2>{editUser ? "Edit User" : "Add Customer"}</h2>
+                        <input
+                            type="text"
+                            placeholder="Nama undangan"
+                            value={usercode}
+                            onChange={(e) => setUsercode(e.target.value)}
+                            style={styles.input}
+                        />
                         <input
                             type="text"
                             placeholder="Username"
@@ -221,18 +247,53 @@ const styles = {
         position: "fixed",
         top: 0,
         left: 0,
-        right: 0,
-        bottom: 0,
+        width: "100%",
+        height: "100%",
         backgroundColor: "rgba(0, 0, 0, 0.5)",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        zIndex: 1000,
     },
-    modal: { background: "#fff", padding: "20px", borderRadius: "8px", width: "400px" },
-    input: { width: "100%", padding: "10px", marginBottom: "10px" },
-    modalActions: { display: "flex", justifyContent: "space-between" },
-    saveButton: { padding: "10px", backgroundColor: "green", color: "#fff", border: "none", cursor: "pointer" },
-    cancelButton: { padding: "10px", backgroundColor: "gray", color: "#fff", border: "none", cursor: "pointer" },
+    modal: {
+        backgroundColor: "#fff",
+        padding: "20px",
+        borderRadius: "8px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        width: "100%",
+        maxWidth: "400px",
+        textAlign: "center", // Center the text and inputs
+    },
+    input: {
+        width: "90%", // Center-align with padding
+        margin: "10px auto", // Add spacing between inputs
+        padding: "10px",
+        border: "1px solid #ccc",
+        borderRadius: "4px",
+        display: "block", // Ensures proper spacing
+        fontSize: "16px",
+    },
+    modalActions: {
+        display: "flex",
+        justifyContent: "space-between",
+        marginTop: "20px",
+    },
+    saveButton: {
+        backgroundColor: "green",
+        color: "white",
+        padding: "10px 20px",
+        borderRadius: "5px",
+        border: "none",
+        cursor: "pointer",
+    },
+    cancelButton: {
+        backgroundColor: "gray",
+        color: "white",
+        padding: "10px 20px",
+        borderRadius: "5px",
+        border: "none",
+        cursor: "pointer",
+    },
     th: {
         backgroundColor: "#f8f9fa",
         fontWeight: "bold",
