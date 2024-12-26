@@ -16,7 +16,7 @@ const UsersTable = () => {
         try {
             const token = localStorage.getItem("token");
             const response = await fetch(
-                `http://localhost:4000/get-users?page=${page}&limit=${limit}`,
+                `http://103.166.228.202:4000/get-users?page=${page}&limit=${limit}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -68,8 +68,8 @@ const UsersTable = () => {
         try {
             const token = localStorage.getItem("token");
             const url = editUser
-                ? `http://localhost:4000/update-user/${editUser.id}`
-                : `http://localhost:4000/register`;
+                ? `http://103.166.228.202:4000/update-user/${editUser.id}`
+                : `http://103.166.228.202:4000/register`;
             const method = editUser ? "PUT" : "POST";
 
             const body = {
@@ -119,7 +119,7 @@ const UsersTable = () => {
 
             if (result.isConfirmed) {
                 const token = localStorage.getItem("token");
-                const response = await fetch(`http://localhost:4000/users/${id}`, {
+                const response = await fetch(`http://103.166.228.202:4000/users/${id}`, {
                     method: "DELETE",
                     headers: {
                         Authorization: `Bearer ${token}`,

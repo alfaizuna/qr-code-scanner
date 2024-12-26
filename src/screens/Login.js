@@ -18,7 +18,7 @@ const Login = ({ setToken, setRole }) => {
         e.preventDefault();
         try {
             const response = await axios.post(
-                "http://localhost:4000/login",
+                "http://103.166.228.202:4000/login",
                 formData,
                 {
                     headers: {
