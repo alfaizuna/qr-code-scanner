@@ -1,11 +1,10 @@
 import React, { useRef, useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import BarcodeScannerComponent from "react-qr-barcode-scanner";
+import QrScanner from "react-qr-scanner";
 import axios from "axios";
 
 function Scanner() {
     const [data, setData] = useState("Not Found");
-    const [torchOn, setTorchOn] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [name, setName] = useState("");
     const [jumlahOrang, setJumlahOrang] = useState("");
@@ -19,14 +18,13 @@ function Scanner() {
 
     const saveScannerData = async () => {
         try {
-            const token = localStorage.getItem("token"); // Get token from localStorage
+            const token = localStorage.getItem("token");
 
             if (!token) {
                 Swal.fire("Error", "You are not authenticated. Please log in.", "error");
                 return;
             }
 
-            // Make the API request to save scanner data
             const response = await axios.post(
                 "http://103.166.228.202:4000/save-scanner-data",
                 { nama: name, jumlah_orang: jumlahOrang },
@@ -63,30 +61,31 @@ function Scanner() {
         setJumlahOrang("");
     };
 
+    const handleScan = (result) => {
+        if (result && result.text !== data) {
+            setData(result.text);
+            setName(result.text);
+            setShowModal(true);
+        }
+    };
+
+    const handleError = (error) => {
+        console.error("QR Scanner Error:", error);
+    };
+
     return (
         <div style={styles.container}>
             <h1 style={styles.title}>Undangan</h1>
             <div style={styles.scannerWrapper}>
-                <BarcodeScannerComponent
-                    width="100%"
-                    height="auto"
-                    torch={torchOn}
-                    onUpdate={(err, result) => {
-                        if (result && result.text !== data) {
-                            setData(result.text);
-                            setName(result.text); // Use the scanned QR code value as the name
-                            setShowModal(true); // Show modal when a barcode is successfully scanned
-                        }
-                    }}
+                <QrScanner
+                    delay={300}
+                    style={styles.previewStyle}
+                    onError={handleError}
+                    onScan={handleScan}
                 />
             </div>
             <h3>Scan QR Code</h3>
             <p>Pastikan <strong>QR Code</strong> tidak ketukar dan jelas kebaca.</p>
-            <div style={styles.controls}>
-                <button style={styles.button} onClick={() => setTorchOn(!torchOn)}>
-                    Switch Torch {torchOn ? "Off" : "On"}
-                </button>
-            </div>
 
             {/* Modal */}
             {showModal && (
@@ -154,30 +153,9 @@ const styles = {
         borderRadius: "10px",
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
     },
-    controls: {
-        marginTop: "20px",
-        textAlign: "center",
-    },
-    button: {
-        padding: "10px 20px",
-        fontSize: "16px",
-        borderRadius: "5px",
-        backgroundColor: "#007BFF",
-        color: "#fff",
-        border: "none",
-        cursor: "pointer",
-        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-    },
-    cancelButton: {
-        padding: "10px 20px",
-        fontSize: "16px",
-        borderRadius: "5px",
-        backgroundColor: "#DC3545",
-        color: "#fff",
-        border: "none",
-        cursor: "pointer",
-        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-        marginLeft: "10px",
+    previewStyle: {
+        width: "100%",
+        height: "100%",
     },
     modalOverlay: {
         position: "fixed",
@@ -221,6 +199,27 @@ const styles = {
     modalActions: {
         display: "flex",
         justifyContent: "flex-end",
+    },
+    button: {
+        padding: "10px 20px",
+        fontSize: "16px",
+        borderRadius: "5px",
+        backgroundColor: "#007BFF",
+        color: "#fff",
+        border: "none",
+        cursor: "pointer",
+        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+    },
+    cancelButton: {
+        padding: "10px 20px",
+        fontSize: "16px",
+        borderRadius: "5px",
+        backgroundColor: "#DC3545",
+        color: "#fff",
+        border: "none",
+        cursor: "pointer",
+        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+        marginLeft: "10px",
     },
 };
 
