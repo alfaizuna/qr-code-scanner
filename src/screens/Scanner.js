@@ -17,6 +17,20 @@ function Scanner() {
         }
     }, [showModal]);
 
+    useEffect(() => {
+        const preloadCamera = async () => {
+            try {
+                await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: useFrontCamera ? "user" : "environment" },
+                });
+            } catch (error) {
+                console.error("Camera preload failed:", error);
+            }
+        };
+
+        preloadCamera();
+    }, [useFrontCamera]);
+
     const saveScannerData = async () => {
         try {
             const token = localStorage.getItem("token");
@@ -34,9 +48,7 @@ function Scanner() {
 
             Swal.fire("Success", response.data.message, "success").then(() => {
                 setShowModal(false);
-                setData("Not Found");
-                setName("");
-                setJumlahOrang("");
+                // window.location.reload();
             });
         } catch (error) {
             console.error("Error saving data:", error);
@@ -53,13 +65,25 @@ function Scanner() {
             Swal.fire("Warning", "Please fill out all fields.", "warning");
             return;
         }
-        saveScannerData();
+        if (jumlahOrang===0) {
+            Swal.fire("Warning", "Jumlah orang tidak boleh 0", "warning");
+            return;
+        }
+        saveScannerData().then(resetScannerState);
+    };
+
+    const resetScannerState = () => {
+        setData("Not Found");
+        setName("");
+        setJumlahOrang("");
     };
 
     const handleCancel = () => {
         setShowModal(false);
+        setData("Not Found");
         setName("");
         setJumlahOrang("");
+        // window.location.reload();
     };
 
     const handleScan = (result) => {
@@ -81,23 +105,22 @@ function Scanner() {
     return (
         <div style={styles.container}>
             <h1 style={styles.title}>Undangan</h1>
-            <button style={styles.toggleButton} onClick={toggleCamera}>
-                Switch to {useFrontCamera ? "Back" : "Front"} Camera
-            </button>
             <div style={styles.scannerWrapper}>
                 <QrScanner
-                    delay={300}
+                    delay={50}
                     style={styles.previewStyle}
                     onError={handleError}
                     onScan={handleScan}
                     constraints={{
-                        video: { facingMode: useFrontCamera ? "user" : "environment" },
+                        video: {facingMode: useFrontCamera ? "user" : "environment"},
                     }}
                 />
             </div>
             <h3>Scan QR Code</h3>
             <p>Pastikan <strong>QR Code</strong> tidak ketukar dan jelas kebaca.</p>
-
+            <button style={styles.toggleButton} onClick={toggleCamera}>
+                Switch to {useFrontCamera ? "Back" : "Front"} Camera
+            </button>
             {/* Modal */}
             {showModal && (
                 <div style={styles.modalOverlay}>
