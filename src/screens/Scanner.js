@@ -17,20 +17,6 @@ function Scanner() {
         }
     }, [showModal]);
 
-    useEffect(() => {
-        const preloadCamera = async () => {
-            try {
-                await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: useFrontCamera ? "user" : "environment" },
-                });
-            } catch (error) {
-                console.error("Camera preload failed:", error);
-            }
-        };
-
-        preloadCamera();
-    }, [useFrontCamera]);
-
     const saveScannerData = async () => {
         try {
             const token = localStorage.getItem("token");
@@ -48,7 +34,7 @@ function Scanner() {
 
             Swal.fire("Success", response.data.message, "success").then(() => {
                 setShowModal(false);
-                // window.location.reload();
+                window.location.reload();
             });
         } catch (error) {
             console.error("Error saving data:", error);
@@ -83,7 +69,7 @@ function Scanner() {
         setData("Not Found");
         setName("");
         setJumlahOrang("");
-        // window.location.reload();
+        window.location.reload();
     };
 
     const handleScan = (result) => {
