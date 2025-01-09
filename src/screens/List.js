@@ -23,7 +23,7 @@ function List() {
         try {
             const token = localStorage.getItem("token");
             const response = await axios.get(
-                `http://103.166.228.202:4000/get-scanner-data?page=${page}&limit=${limit}`,
+                `${process.env.REACT_APP_API_URL}/get-scanner-data?page=${page}&limit=${limit}`,
                 {
                     headers: { Authorization: `Bearer ${token}` },
                 }
@@ -63,7 +63,7 @@ function List() {
         try {
             const token = localStorage.getItem("token");
             const response = await axios.put(
-                `http://103.166.228.202:4000/update-scanner-data/${editingGuest.id}`,
+                `${process.env.REACT_APP_API_URL}/update-scanner-data/${editingGuest.id}`,
                 editingGuest,
                 {
                     headers: { Authorization: `Bearer ${token}` },
@@ -104,7 +104,7 @@ function List() {
         try {
             const token = localStorage.getItem("token"); // Retrieve the token for authorization
             const response = await axios.post(
-                "http://103.166.228.202:4000/save-scanner-data",
+                `${process.env.REACT_APP_API_URL}/save-scanner-data`,
                 newGuest,
                 {
                     headers: { Authorization: `Bearer ${token}` },

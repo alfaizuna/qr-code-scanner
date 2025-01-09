@@ -16,7 +16,7 @@ const UsersTable = () => {
         try {
             const token = localStorage.getItem("token");
             const response = await fetch(
-                `http://103.166.228.202:4000/get-users?page=${page}&limit=${limit}`,
+                `https://app-1.alfaizuna.my.id/get-users?page=${page}&limit=${limit}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -68,8 +68,8 @@ const UsersTable = () => {
         try {
             const token = localStorage.getItem("token");
             const url = editUser
-                ? `http://103.166.228.202:4000/update-user/${editUser.id}`
-                : `http://103.166.228.202:4000/register`;
+                ? `${process.env.REACT_APP_API_URL}/update-user/${editUser.id}`
+                : `${process.env.REACT_APP_API_URL}/register`;
             const method = editUser ? "PUT" : "POST";
 
             const body = {
@@ -119,7 +119,7 @@ const UsersTable = () => {
 
             if (result.isConfirmed) {
                 const token = localStorage.getItem("token");
-                const response = await fetch(`http://103.166.228.202:4000/users/${id}`, {
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/users/${id}`, {
                     method: "DELETE",
                     headers: {
                         Authorization: `Bearer ${token}`,

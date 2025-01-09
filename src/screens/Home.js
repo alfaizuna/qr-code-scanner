@@ -13,7 +13,7 @@ const Home = () => {
         const fetchTotalJumlahOrang = async () => {
             try {
                 const token = localStorage.getItem("token"); // Retrieve token for authentication
-                const response = await fetch("http://103.166.228.202:4000/get-total-jumlah-orang", {
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/get-total-jumlah-orang`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

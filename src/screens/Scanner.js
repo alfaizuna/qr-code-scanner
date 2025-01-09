@@ -26,7 +26,7 @@ function Scanner() {
             }
 
             const response = await axios.post(
-                "http://103.166.228.202:4000/save-scanner-data",
+                `${process.env.REACT_APP_API_URL}/save-scanner-data`,
                 { nama: name, jumlah_orang: jumlahOrang },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

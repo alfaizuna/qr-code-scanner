@@ -46,5 +46,5 @@
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "react-qr-barcode-scanner": "^2.0.0"
   },
-  "proxy": "http://103.166.228.202:4000"
+  "proxy": "https://app-1.alfaizuna.my.id"
 }
