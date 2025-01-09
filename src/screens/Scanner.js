@@ -8,6 +8,7 @@ function Scanner() {
     const [showModal, setShowModal] = useState(false);
     const [name, setName] = useState("");
     const [jumlahOrang, setJumlahOrang] = useState("");
+    const [useFrontCamera, setUseFrontCamera] = useState(false); // State to toggle camera
     const jumlahOrangRef = useRef(null);
 
     useEffect(() => {
@@ -73,15 +74,25 @@ function Scanner() {
         console.error("QR Scanner Error:", error);
     };
 
+    const toggleCamera = () => {
+        setUseFrontCamera((prev) => !prev);
+    };
+
     return (
         <div style={styles.container}>
             <h1 style={styles.title}>Undangan</h1>
+            <button style={styles.toggleButton} onClick={toggleCamera}>
+                Switch to {useFrontCamera ? "Back" : "Front"} Camera
+            </button>
             <div style={styles.scannerWrapper}>
                 <QrScanner
                     delay={300}
                     style={styles.previewStyle}
                     onError={handleError}
                     onScan={handleScan}
+                    constraints={{
+                        video: { facingMode: useFrontCamera ? "user" : "environment" },
+                    }}
                 />
             </div>
             <h3>Scan QR Code</h3>
@@ -144,6 +155,16 @@ const styles = {
         marginBottom: "20px",
         textAlign: "center",
         color: "#333",
+    },
+    toggleButton: {
+        padding: "10px 20px",
+        marginBottom: "20px",
+        fontSize: "16px",
+        borderRadius: "5px",
+        backgroundColor: "#007BFF",
+        color: "#fff",
+        border: "none",
+        cursor: "pointer",
     },
     scannerWrapper: {
         width: "100%",
