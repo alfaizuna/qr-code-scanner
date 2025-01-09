@@ -12,6 +12,14 @@ function Scanner() {
     const jumlahOrangRef = useRef(null);
 
     useEffect(() => {
+        // Initialize camera state from localStorage
+        const savedCameraState = localStorage.getItem("useFrontCamera");
+        if (savedCameraState !== null) {
+            setUseFrontCamera(JSON.parse(savedCameraState));
+        }
+    }, []);
+
+    useEffect(() => {
         if (showModal && jumlahOrangRef.current) {
             jumlahOrangRef.current.focus();
         }
@@ -51,7 +59,7 @@ function Scanner() {
             Swal.fire("Warning", "Please fill out all fields.", "warning");
             return;
         }
-        if (jumlahOrang===0) {
+        if (jumlahOrang === 0) {
             Swal.fire("Warning", "Jumlah orang tidak boleh 0", "warning");
             return;
         }
@@ -85,7 +93,11 @@ function Scanner() {
     };
 
     const toggleCamera = () => {
-        setUseFrontCamera((prev) => !prev);
+        setUseFrontCamera((prev) => {
+            const newCameraState = !prev;
+            localStorage.setItem("useFrontCamera", JSON.stringify(newCameraState)); // Save to localStorage
+            return newCameraState;
+        });
     };
 
     return (
@@ -98,7 +110,7 @@ function Scanner() {
                     onError={handleError}
                     onScan={handleScan}
                     constraints={{
-                        video: {facingMode: useFrontCamera ? "user" : "environment"},
+                        video: { facingMode: useFrontCamera ? "user" : "environment" },
                     }}
                 />
             </div>
