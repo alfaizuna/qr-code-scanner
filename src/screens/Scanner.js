@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import QrScanner from "react-qr-scanner";
 import axios from "axios";
+import {useNavigate} from "react-router-dom";
 
 function Scanner() {
     const [data, setData] = useState("Not Found");
@@ -10,6 +11,7 @@ function Scanner() {
     const [jumlahOrang, setJumlahOrang] = useState("");
     const [useFrontCamera, setUseFrontCamera] = useState(false); // State to toggle camera
     const jumlahOrangRef = useRef(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         // Initialize camera state from localStorage
@@ -42,7 +44,8 @@ function Scanner() {
 
             Swal.fire("Success", response.data.message, "success").then(() => {
                 setShowModal(false);
-                window.location.reload();
+                // window.location.reload();
+                navigate("/list");
             });
         } catch (error) {
             console.error("Error saving data:", error);
@@ -132,6 +135,7 @@ function Scanner() {
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 placeholder="Enter name"
+                                disabled
                             />
                         </div>
                         <div style={styles.inputGroup}>

@@ -16,14 +16,21 @@ function List() {
     const [totalPages, setTotalPages] = useState(1); // Total pages
     const limit = 5; // Items per page
 
-    // Fetch paginated data
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            fetchData(1);
+        }, 500); // Delay of 500ms
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [searchTerm]);
+
     const fetchData = async (page = 1) => {
         setLoading(true);
         setError("");
         try {
             const token = localStorage.getItem("token");
             const response = await axios.get(
-                `${process.env.REACT_APP_API_URL}/get-scanner-data?page=${page}&limit=${limit}`,
+                `${process.env.REACT_APP_API_URL}/search-by-name?page=${page}&limit=${limit}&name=${searchTerm}`,
                 {
                     headers: { Authorization: `Bearer ${token}` },
                 }
@@ -44,14 +51,14 @@ function List() {
     }, [page]);
 
     // Search handler
-    const handleSearch = (e) => {
+    const handleSearch = async (e) => {
         const term = e.target.value;
         setSearchTerm(term);
-        setFilteredData(
-            data.filter((item) =>
-                item.nama.toLowerCase().includes(term.toLowerCase())
-            )
-        );
+        try {
+            await fetchData(1); // Fetch data with the new search term
+        } catch (err) {
+            console.error("Failed to search", err);
+        }
     };
 
     const handleEditGuest = async (e) => {
@@ -211,7 +218,9 @@ function List() {
         }
     };
 
-    if (loading) return <p>Loading...</p>;
+    if (filteredData.length === 0 && !loading) {
+        return <p style={{ textAlign: "center" }}>No results found.</p>;
+    }
     if (error) return <p style={{ color: "red" }}>{error}</p>;
 
     return (
