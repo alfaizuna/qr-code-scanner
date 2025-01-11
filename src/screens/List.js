@@ -262,7 +262,7 @@ function List() {
                     style={styles.addButton}
                     onClick={() => setIsModalOpen(true)}
                 >
-                    Tambah Tamu
+                    Tambah
                 </button>
                 <input
                     type="text"
@@ -358,10 +358,12 @@ function List() {
                 </button>
             </div>
 
-            <h3 style={{ paddingTop: '20px', paddingBottom: '10px' }}>Download Data to Excel</h3>
-            <button style={styles.downloadButton} onClick={downloadExcel}>
-                Download
-            </button>
+            <div style={styles.cardDownload}>
+                <h2 style={styles.titleDownload}>Download Data to Excel</h2>
+                <button style={styles.buttonDownload} onClick={downloadExcel}>
+                    Download
+                </button>
+            </div>
 
             {/* Modal for Add Guest */}
             {isModalOpen && (
@@ -462,7 +464,7 @@ function List() {
 const styles = {
     container: {padding: "20px"},
     title: {fontSize: "24px", marginBottom: "20px"},
-    controls: { display: "flex", gap: "10px", marginBottom: "20px", width: "100%" },
+    controls: {display: "flex", gap: "10px", marginBottom: "20px", width: "100%" },
     searchInput: {
         padding: "8px",
         border: "1px solid #ccc",
@@ -541,6 +543,34 @@ const styles = {
         border: "none",
         borderRadius: "5px",
         cursor: "pointer",
+    },
+    cardDownload: {
+        maxWidth: "400px",
+        margin: "50px auto",
+        padding: "20px",
+        border: "1px solid #ddd",
+        borderRadius: "10px",
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+        textAlign: "center",
+        backgroundColor: "#f9f9f9",
+    },
+    titleDownload: {
+        fontSize: "20px",
+        marginBottom: "20px",
+        color: "#333",
+    },
+    buttonDownload: {
+        padding: "10px 20px",
+        fontSize: "16px",
+        color: "white",
+        backgroundColor: "#4285F4",
+        border: "none",
+        borderRadius: "5px",
+        cursor: "pointer",
+        transition: "background-color 0.3s ease",
+    },
+    buttonHover: {
+        backgroundColor: "#357ae8",
     },
 };
 
