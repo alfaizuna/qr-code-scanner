@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import * as XLSX from "xlsx";
 import Swal from "sweetalert2";
+import Dropdown from "react-bootstrap/Dropdown";
 
 function List() {
     const [data, setData] = useState([]);
@@ -58,6 +59,35 @@ function List() {
             await fetchData(1); // Fetch data with the new search term
         } catch (err) {
             console.error("Failed to search", err);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await axios.delete(
+                `${process.env.REACT_APP_API_URL}/delete-scanner-data/${id}`,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+
+            if (response.status === 200) {
+                await Swal.fire({
+                    icon: "success",
+                    title: "Deleted",
+                    text: "Data deleted successfully!",
+                    timer: 2000,
+                    showConfirmButton: false,
+                });
+                fetchData(page); // Refresh the data to reflect the deletion
+            }
+        } catch (err) {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: err.response?.data?.error || "Failed to delete data.",
+            });
         }
     };
 
@@ -275,12 +305,36 @@ function List() {
                             )}
                         </td>
                         <td style={styles.td}>
-                            <button
-                                style={styles.editButton}
-                                onClick={() => handleEditClick(item)}
-                            >
-                                Edit
-                            </button>
+                            <Dropdown>
+                                <Dropdown.Toggle style={styles.dropdownToggle} size="sm">
+                                    Actions
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu>
+                                    <Dropdown.Item onClick={() => handleEditClick(item)}>
+                                        Edit
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        onClick={() =>
+                                            Swal.fire({
+                                                title: "Are you sure?",
+                                                text: "You won't be able to revert this!",
+                                                icon: "warning",
+                                                showCancelButton: true,
+                                                confirmButtonColor: "#d33",
+                                                cancelButtonColor: "#3085d6",
+                                                confirmButtonText: "Yes, delete it!",
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    handleDelete(item.id);
+                                                }
+                                            })
+                                        }
+                                    >
+                                        Delete
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
                         </td>
                     </tr>
                 ))}
@@ -433,7 +487,7 @@ const styles = {
         height: "40px", // Match height with the search input
     },
     table: { width: "100%", borderCollapse: "collapse" },
-    th: { border: "1px solid #ddd", padding: "8px", backgroundColor: "#f8f9fa" },
+    th: { border: "1px solid #ddd", padding: "8px", backgroundColor: "#f8f9fa", textAlign: "center" },
     td: { border: "1px solid #ddd", padding: "8px", textAlign: "center" },
     pagination: { display: "flex", justifyContent: "center", marginTop: "20px" },
     paginationButton: { padding: "10px 20px", margin: "0 5px", borderRadius: "5px" },
@@ -478,6 +532,14 @@ const styles = {
         color: "#fff",
         border: "none",
         borderRadius: "5px",
+    },
+    dropdownToggle: {
+        padding: "5px 10px",
+        backgroundColor: "#007bff",
+        color: "#fff",
+        border: "none",
+        borderRadius: "5px",
+        cursor: "pointer",
     },
 };
 

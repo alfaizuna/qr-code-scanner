@@ -6,6 +6,7 @@ import List from "./screens/List";
 import Login from "./screens/Login";
 import UsersTable from "./screens/UsersTable";
 import "./App.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
     const [token, setToken] = useState(localStorage.getItem("token") || null);
