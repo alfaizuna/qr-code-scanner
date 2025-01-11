@@ -44,14 +44,13 @@ function Scanner() {
 
             Swal.fire("Success", response.data.message, "success").then(() => {
                 setShowModal(false);
-                // window.location.reload();
-                navigate("/list");
+                window.location.reload();
             });
         } catch (error) {
-            console.error("Error saving data:", error);
+            console.error("Galat menyimpan data:", error);
             Swal.fire(
                 "Error",
-                error.response?.data?.error || "Failed to save data. Please try again.",
+                error.response?.data?.error || "Gagal menyimpan data. coba lagi.",
                 "error"
             );
         }
@@ -59,7 +58,7 @@ function Scanner() {
 
     const handleConfirm = () => {
         if (!name || !jumlahOrang) {
-            Swal.fire("Warning", "Please fill out all fields.", "warning");
+            Swal.fire("Warning", "Tolong isi semua kolom.", "warning");
             return;
         }
         if (jumlahOrang === 0) {
@@ -117,10 +116,10 @@ function Scanner() {
                     }}
                 />
             </div>
-            <h3>Scan QR Code</h3>
+            <h3 style={{paddingTop: '20px'}}>Scan QR Code</h3>
             <p>Pastikan <strong>QR Code</strong> tidak ketukar dan jelas kebaca.</p>
             <button style={styles.toggleButton} onClick={toggleCamera}>
-                Switch to {useFrontCamera ? "Back" : "Front"} Camera
+                Ubah Kamera {useFrontCamera ? "Belakang" : "Depan"}
             </button>
             {/* Modal */}
             {showModal && (
@@ -134,7 +133,7 @@ function Scanner() {
                                 type="text"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                placeholder="Enter name"
+                                placeholder="Masukkan nama"
                                 disabled
                             />
                         </div>
@@ -145,7 +144,7 @@ function Scanner() {
                                 type="tel"
                                 value={jumlahOrang}
                                 onChange={(e) => setJumlahOrang(e.target.value)}
-                                placeholder="Enter number of people"
+                                placeholder="Masukkan jumlah orang"
                                 ref={jumlahOrangRef}
                             />
                         </div>

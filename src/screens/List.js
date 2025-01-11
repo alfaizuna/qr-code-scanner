@@ -75,9 +75,9 @@ function List() {
             if (response.status === 200) {
                 await Swal.fire({
                     icon: "success",
-                    title: "Deleted",
-                    text: "Data deleted successfully!",
-                    timer: 2000,
+                    title: "Terhapus",
+                    text: "Data sukses terhapus!",
+                    timer: 1000,
                     showConfirmButton: false,
                 });
                 fetchData(page); // Refresh the data to reflect the deletion
@@ -110,7 +110,7 @@ function List() {
                 await Swal.fire({
                     icon: "success",
                     title: "Success",
-                    text: "Guest updated successfully!",
+                    text: "Tamu sukses ter update!",
                     timer: 2000,
                     showConfirmButton: false,
                 });
@@ -134,7 +134,7 @@ function List() {
     const handleAddGuest = async (e) => {
         e.preventDefault();
         if (!newGuest.nama || !newGuest.jumlah_orang) {
-            alert("Please fill in all fields");
+            alert("Tolong isi semua kolom!");
             return;
         }
 
@@ -152,8 +152,8 @@ function List() {
                 await Swal.fire({
                     icon: "success",
                     title: "Success",
-                    text: "Guest added successfully!",
-                    timer: 2000,
+                    text: "Tamu sukses di tambahkan!",
+                    timer: 1000,
                     showConfirmButton: false,
                 });
                 setNewGuest({ nama: "", jumlah_orang: "" });
@@ -164,7 +164,7 @@ function List() {
             Swal.fire({
                 icon: "error",
                 title: "Error",
-                text: err.response?.data?.error || "Failed to add guest.",
+                text: err.response?.data?.error || "Gagal untuk menambahkan tamu.",
             });
         }
     };
@@ -172,7 +172,7 @@ function List() {
     // Download data as Excel
     const downloadExcel = () => {
         if (data.length === 0) {
-            alert("No data available to download");
+            alert("Tidak ada data untuk diunduh.");
             return;
         }
 
@@ -262,7 +262,7 @@ function List() {
                     style={styles.addButton}
                     onClick={() => setIsModalOpen(true)}
                 >
-                    Add Guest
+                    Tambah Tamu
                 </button>
                 <input
                     type="text"
@@ -272,10 +272,6 @@ function List() {
                     style={styles.searchInput}
                 />
             </div>
-
-            <button style={styles.downloadButton} onClick={downloadExcel}>
-                Download Excel
-            </button>
 
             {/* Table */}
             <table style={styles.table}>
@@ -312,18 +308,18 @@ function List() {
 
                                 <Dropdown.Menu>
                                     <Dropdown.Item onClick={() => handleEditClick(item)}>
-                                        Edit
+                                        Ubah
                                     </Dropdown.Item>
                                     <Dropdown.Item
                                         onClick={() =>
                                             Swal.fire({
-                                                title: "Are you sure?",
-                                                text: "You won't be able to revert this!",
+                                                title: "Apakah kamu yakin?",
+                                                text: "Kamu tidak akan bisa mengembalikan aksi ini!",
                                                 icon: "warning",
                                                 showCancelButton: true,
                                                 confirmButtonColor: "#d33",
                                                 cancelButtonColor: "#3085d6",
-                                                confirmButtonText: "Yes, delete it!",
+                                                confirmButtonText: "Ya, Hapus ini!",
                                             }).then((result) => {
                                                 if (result.isConfirmed) {
                                                     handleDelete(item.id);
@@ -331,7 +327,7 @@ function List() {
                                             })
                                         }
                                     >
-                                        Delete
+                                        Hapus
                                     </Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
@@ -362,11 +358,16 @@ function List() {
                 </button>
             </div>
 
+            <h3 style={{ paddingTop: '20px', paddingBottom: '10px' }}>Download Data to Excel</h3>
+            <button style={styles.downloadButton} onClick={downloadExcel}>
+                Download
+            </button>
+
             {/* Modal for Add Guest */}
             {isModalOpen && (
                 <div style={styles.modal}>
                     <div style={styles.modalContent}>
-                        <h2 style={styles.modalTitle}>Add Guest</h2>
+                        <h2 style={styles.modalTitle}>Tambah Tamu</h2>
                         <form onSubmit={handleAddGuest}>
                             <input
                                 type="text"
@@ -412,7 +413,7 @@ function List() {
             {editingGuest && (
                 <div style={styles.modal}>
                     <div style={styles.modalContent}>
-                        <h2 style={styles.modalTitle}>Edit Guest</h2>
+                        <h2 style={styles.modalTitle}>Ubah Tamu</h2>
                         <form onSubmit={handleEditGuest}>
                             <input
                                 type="text"
@@ -440,14 +441,14 @@ function List() {
                             />
                             <div style={styles.modalActions}>
                                 <button type="submit" style={styles.modalButton}>
-                                    Save
+                                    Simpan
                                 </button>
                                 <button
                                     type="button"
                                     style={styles.modalButtonCancel}
                                     onClick={() => setEditingGuest(null)}
                                 >
-                                    Cancel
+                                    Batal
                                 </button>
                             </div>
                         </form>
@@ -463,7 +464,7 @@ const styles = {
     title: {fontSize: "24px", marginBottom: "20px"},
     controls: { display: "flex", gap: "10px", marginBottom: "20px", width: "100%" },
     searchInput: {
-        padding: "10px",
+        padding: "8px",
         border: "1px solid #ccc",
         borderRadius: "5px",
         flex: "1",
@@ -479,7 +480,7 @@ const styles = {
         marginBottom: "10px",
     },
     addButton: {
-        padding: "10px 20px",
+        padding: "5px 20px",
         backgroundColor: "#28a745",
         color: "#fff",
         border: "none",
