@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import axios from "axios";
 import * as XLSX from "xlsx";
 import Swal from "sweetalert2";
@@ -8,7 +8,7 @@ function List() {
     const [data, setData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [searchTerm, setSearchTerm] = useState(""); // Search term
-    const [newGuest, setNewGuest] = useState({ nama: "", jumlah_orang: "" }); // New guest form
+    const [newGuest, setNewGuest] = useState({nama: "", jumlah_orang: ""}); // New guest form
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingGuest, setEditingGuest] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -33,7 +33,7 @@ function List() {
             const response = await axios.get(
                 `${process.env.REACT_APP_API_URL}/search-by-name?page=${page}&limit=${limit}&name=${searchTerm}`,
                 {
-                    headers: { Authorization: `Bearer ${token}` },
+                    headers: {Authorization: `Bearer ${token}`},
                 }
             );
             setData(response.data.data);
@@ -68,7 +68,7 @@ function List() {
             const response = await axios.delete(
                 `${process.env.REACT_APP_API_URL}/delete-scanner-data/${id}`,
                 {
-                    headers: { Authorization: `Bearer ${token}` },
+                    headers: {Authorization: `Bearer ${token}`},
                 }
             );
 
@@ -103,7 +103,7 @@ function List() {
                 `${process.env.REACT_APP_API_URL}/update-scanner-data/${editingGuest.id}`,
                 editingGuest,
                 {
-                    headers: { Authorization: `Bearer ${token}` },
+                    headers: {Authorization: `Bearer ${token}`},
                 }
             );
             if (response.status === 200) {
@@ -144,7 +144,7 @@ function List() {
                 `${process.env.REACT_APP_API_URL}/save-scanner-data`,
                 newGuest,
                 {
-                    headers: { Authorization: `Bearer ${token}` },
+                    headers: {Authorization: `Bearer ${token}`},
                 }
             );
 
@@ -156,7 +156,7 @@ function List() {
                     timer: 1000,
                     showConfirmButton: false,
                 });
-                setNewGuest({ nama: "", jumlah_orang: "" });
+                setNewGuest({nama: "", jumlah_orang: ""});
                 setIsModalOpen(false); // Close the modal
                 fetchData(page); // Refresh the data to reflect the new entry
             }
@@ -181,7 +181,7 @@ function List() {
             const date = new Date(dateString); // Parse the input date
             const utc = date.getTime() + date.getTimezoneOffset() * 60000; // Convert to UTC
             const localTime = new Date(utc + offset * 3600000); // Adjust for timezone offset
-            return localTime.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit"});
+            return localTime.toLocaleTimeString("id-ID", {hour: "2-digit", minute: "2-digit"});
         };
 
         // Map the data to include the new 'jam kehadiran' field
@@ -196,23 +196,23 @@ function List() {
         });
 
         // Remove 'created_date' and keep the modified 'jam kehadiran'
-        const finalData = adjustedData.map(({ id, created_date, ...rest }) => rest);
+        const finalData = adjustedData.map(({id, created_date, ...rest}) => rest);
         const worksheet = XLSX.utils.json_to_sheet(finalData);
 
         // Apply header styles
         const range = XLSX.utils.decode_range(worksheet['!ref']);
         for (let C = range.s.c; C <= range.e.c; ++C) {
-            const cellAddress = XLSX.utils.encode_cell({ r: 0, c: C });
+            const cellAddress = XLSX.utils.encode_cell({r: 0, c: C});
             if (!worksheet[cellAddress]) continue;
 
             // Make header bold
             worksheet[cellAddress].s = {
-                font: { bold: true }, // Set bold font
+                font: {bold: true}, // Set bold font
                 border: {
-                    top: { style: "thin" },
-                    bottom: { style: "thin" },
-                    left: { style: "thin" },
-                    right: { style: "thin" },
+                    top: {style: "thin"},
+                    bottom: {style: "thin"},
+                    left: {style: "thin"},
+                    right: {style: "thin"},
                 },
             };
         }
@@ -220,16 +220,16 @@ function List() {
         // Apply borders to all cells
         for (let R = range.s.r; R <= range.e.r; ++R) {
             for (let C = range.s.c; C <= range.e.c; ++C) {
-                const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+                const cellAddress = XLSX.utils.encode_cell({r: R, c: C});
                 if (!worksheet[cellAddress]) continue;
 
                 worksheet[cellAddress].s = {
                     ...worksheet[cellAddress].s,
                     border: {
-                        top: { style: "thin" },
-                        bottom: { style: "thin" },
-                        left: { style: "thin" },
-                        right: { style: "thin" },
+                        top: {style: "thin"},
+                        bottom: {style: "thin"},
+                        left: {style: "thin"},
+                        right: {style: "thin"},
                     },
                 };
             }
@@ -248,10 +248,10 @@ function List() {
         }
     };
 
-    if (filteredData.length === 0 && !loading) {
-        return <p style={{ textAlign: "center" }}>No results found.</p>;
-    }
-    if (error) return <p style={{ color: "red" }}>{error}</p>;
+    // if (filteredData.length === 0 && !loading) {
+    //     return <p style={{ textAlign: "center" }}>No results found.</p>;
+    // }
+    if (error) return <p style={{color: "red"}}>{error}</p>;
 
     return (
         <div style={styles.container}>
@@ -285,85 +285,94 @@ function List() {
                 </tr>
                 </thead>
                 <tbody>
-                {filteredData.map((item, index) => (
-                    <tr key={item.id}>
-                        <td style={styles.td}>{(page - 1) * limit + index + 1}</td>
-                        <td style={styles.td}>{item.nama}</td>
-                        <td style={styles.td}>{item.jumlah_orang}</td>
-                        <td style={styles.td}>
-                            {new Date(item.created_date).toLocaleTimeString(
-                                "en-US",
-                                {
+                {filteredData.length > 0 && !loading ? (
+                    filteredData.map((item, index) => (
+                        <tr key={item.id}>
+                            <td style={styles.td}>{(page - 1) * limit + index + 1}</td>
+                            <td style={styles.td}>{item.nama}</td>
+                            <td style={styles.td}>{item.jumlah_orang}</td>
+                            <td style={styles.td}>
+                                {new Date(item.created_date).toLocaleTimeString("en-US", {
                                     hour: "2-digit",
                                     minute: "2-digit",
                                     hour12: false,
-                                }
-                            )}
-                        </td>
-                        <td style={styles.td}>
-                            <Dropdown>
-                                <Dropdown.Toggle style={styles.dropdownToggle} size="sm">
-                                    Actions
-                                </Dropdown.Toggle>
+                                })}
+                            </td>
+                            <td style={styles.td}>
+                                <Dropdown>
+                                    <Dropdown.Toggle style={styles.dropdownToggle} size="sm">
+                                        Actions
+                                    </Dropdown.Toggle>
 
-                                <Dropdown.Menu>
-                                    <Dropdown.Item onClick={() => handleEditClick(item)}>
-                                        Ubah
-                                    </Dropdown.Item>
-                                    <Dropdown.Item
-                                        onClick={() =>
-                                            Swal.fire({
-                                                title: "Apakah kamu yakin?",
-                                                text: "Kamu tidak akan bisa mengembalikan aksi ini!",
-                                                icon: "warning",
-                                                showCancelButton: true,
-                                                confirmButtonColor: "#d33",
-                                                cancelButtonColor: "#3085d6",
-                                                confirmButtonText: "Ya, Hapus ini!",
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    handleDelete(item.id);
-                                                }
-                                            })
-                                        }
-                                    >
-                                        Hapus
-                                    </Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item onClick={() => handleEditClick(item)}>
+                                            Ubah
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            onClick={() =>
+                                                Swal.fire({
+                                                    title: "Apakah kamu yakin?",
+                                                    text: "Kamu tidak akan bisa mengembalikan aksi ini!",
+                                                    icon: "warning",
+                                                    showCancelButton: true,
+                                                    confirmButtonColor: "#d33",
+                                                    cancelButtonColor: "#3085d6",
+                                                    confirmButtonText: "Ya, Hapus ini!",
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        handleDelete(item.id);
+                                                    }
+                                                })
+                                            }
+                                        >
+                                            Hapus
+                                        </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </td>
+                        </tr>
+                    ))
+                ) : (
+                    <tr>
+                        <td colSpan="5" style={{...styles.td, textAlign: "center", fontStyle: "italic"}}>
+                            Tidak ada data yang ditemukan.
                         </td>
                     </tr>
-                ))}
+                )}
                 </tbody>
             </table>
 
-            {/* Pagination Controls */}
-            <div style={styles.pagination}>
-                <button
-                    style={styles.paginationButton}
-                    onClick={() => handlePageChange(page - 1)}
-                    disabled={page === 1}
-                >
-                    Previous
-                </button>
-                <span style={styles.pageInfo}>
+            {filteredData.length > 0 && !loading ? (
+                <>
+                    {/* Pagination Controls */}
+                    <div style={styles.pagination}>
+                        <button
+                            style={styles.paginationButton}
+                            onClick={() => handlePageChange(page - 1)}
+                            disabled={page === 1}
+                        >
+                            Previous
+                        </button>
+                        <span style={styles.pageInfo}>
                     Page {page} of {totalPages}
                 </span>
-                <button
-                    style={styles.paginationButton}
-                    onClick={() => handlePageChange(page + 1)}
-                    disabled={page === totalPages}
-                >
-                    Next
-                </button>
-            </div>
+                        <button
+                            style={styles.paginationButton}
+                            onClick={() => handlePageChange(page + 1)}
+                            disabled={page === totalPages}
+                        >
+                            Next
+                        </button>
+                    </div>
 
-            <div style={styles.cardDownload}>
-                <h2 style={styles.titleDownload}>Download Data to Excel</h2>
-                <button style={styles.buttonDownload} onClick={downloadExcel}>
-                    Download
-                </button>
-            </div>
+                    <div style={styles.cardDownload}>
+                        <h2 style={styles.titleDownload}>Download Data to Excel</h2>
+                        <button style={styles.buttonDownload} onClick={downloadExcel}>
+                            Download
+                        </button>
+                    </div>
+                </>
+            ) : <></>}
 
             {/* Modal for Add Guest */}
             {isModalOpen && (
@@ -464,7 +473,7 @@ function List() {
 const styles = {
     container: {padding: "20px"},
     title: {fontSize: "24px", marginBottom: "20px"},
-    controls: {display: "flex", gap: "10px", marginBottom: "20px", width: "100%" },
+    controls: {display: "flex", gap: "10px", marginBottom: "20px", width: "100%"},
     searchInput: {
         padding: "8px",
         border: "1px solid #ccc",
@@ -489,12 +498,12 @@ const styles = {
         borderRadius: "5px",
         height: "40px", // Match height with the search input
     },
-    table: { width: "100%", borderCollapse: "collapse" },
-    th: { border: "1px solid #ddd", padding: "8px", backgroundColor: "#f8f9fa", textAlign: "center" },
-    td: { border: "1px solid #ddd", padding: "8px", textAlign: "center" },
-    pagination: { display: "flex", justifyContent: "center", marginTop: "20px" },
-    paginationButton: { padding: "10px 20px", margin: "0 5px", borderRadius: "5px" },
-    pageInfo: { margin: "0 10px" },
+    table: {width: "100%", borderCollapse: "collapse"},
+    th: {border: "1px solid #ddd", padding: "8px", backgroundColor: "#f8f9fa", textAlign: "center"},
+    td: {border: "1px solid #ddd", padding: "8px", textAlign: "center"},
+    pagination: {display: "flex", justifyContent: "center", marginTop: "20px"},
+    paginationButton: {padding: "10px 20px", margin: "0 5px", borderRadius: "5px"},
+    pageInfo: {margin: "0 10px"},
     modal: {
         position: "fixed",
         top: 0,
@@ -513,7 +522,7 @@ const styles = {
         width: "400px",
         textAlign: "center",
     },
-    modalTitle: { marginBottom: "20px" },
+    modalTitle: {marginBottom: "20px"},
     modalInput: {
         display: "block",
         width: "100%",
@@ -522,8 +531,8 @@ const styles = {
         border: "1px solid #ccc",
         borderRadius: "5px",
     },
-    modalActions: { display: "flex", justifyContent: "space-between" },
-    modalButton: { padding: "10px 20px", backgroundColor: "#28a745", color: "#fff" },
+    modalActions: {display: "flex", justifyContent: "space-between"},
+    modalButton: {padding: "10px 20px", backgroundColor: "#28a745", color: "#fff"},
     modalButtonCancel: {
         padding: "10px 20px",
         backgroundColor: "#dc3545",
