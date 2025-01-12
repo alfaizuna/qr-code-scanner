@@ -44,9 +44,7 @@ function Scanner() {
 
             Swal.fire("Success", response.data.message, "success").then(() => {
                 setShowModal(false);
-                setTimeout(() => {
-                    navigate("/list");
-                }, 1000);
+                navigate("/list");
             });
         } catch (error) {
             console.error("Galat menyimpan data:", error);
@@ -54,12 +52,12 @@ function Scanner() {
                 "Error",
                 error.response?.data?.error || "Gagal menyimpan data. coba lagi.",
                 "error"
-            );
-            setShowModal(false);
-
-            setTimeout(() => {
+            ).then(() => {
+                // Reload the page after the user clicks OK
                 window.location.reload();
-            }, 2000);
+            });
+
+            setShowModal(false);
         }
     };
 
@@ -82,13 +80,26 @@ function Scanner() {
     };
 
     const handleCancel = () => {
-        setShowModal(false);
-        setData("Not Found");
-        setName("");
-        setJumlahOrang("");
-        setTimeout(() => {
-            window.location.reload();
-        }, 1000);
+        Swal.fire({
+            title: "Apakah Anda yakin?",
+            text: "Perubahan yang belum disimpan akan hilang.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Ya, batalkan!",
+            cancelButtonText: "Tidak, kembali",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                setShowModal(false);
+                setData("Not Found");
+                setName("");
+                setJumlahOrang("");
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            }
+        });
     };
 
     const handleScan = (result) => {
@@ -109,6 +120,11 @@ function Scanner() {
             localStorage.setItem("useFrontCamera", JSON.stringify(newCameraState)); // Save to localStorage
             return newCameraState;
         });
+
+        // Reload the page after toggling the camera
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000); // Optional: Add a slight delay if needed for smoother user experience
     };
 
     return (
