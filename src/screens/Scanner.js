@@ -117,14 +117,9 @@ function Scanner() {
     const toggleCamera = () => {
         setUseFrontCamera((prev) => {
             const newCameraState = !prev;
-            localStorage.setItem("useFrontCamera", JSON.stringify(newCameraState)); // Save to localStorage
+            localStorage.setItem("useFrontCamera", JSON.stringify(newCameraState));
             return newCameraState;
         });
-
-        // Reload the page after toggling the camera
-        setTimeout(() => {
-            window.location.reload();
-        }, 1000); // Optional: Add a slight delay if needed for smoother user experience
     };
 
     return (
