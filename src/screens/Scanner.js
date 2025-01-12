@@ -46,7 +46,7 @@ function Scanner() {
                 setShowModal(false);
                 setTimeout(() => {
                     navigate("/list");
-                }, 500);
+                }, 1000);
             });
         } catch (error) {
             console.error("Galat menyimpan data:", error);
@@ -59,7 +59,7 @@ function Scanner() {
 
             setTimeout(() => {
                 window.location.reload();
-            }, 1000);
+            }, 2000);
         }
     };
 
@@ -88,7 +88,7 @@ function Scanner() {
         setJumlahOrang("");
         setTimeout(() => {
             window.location.reload();
-        }, 500);
+        }, 1000);
     };
 
     const handleScan = (result) => {

@@ -77,7 +77,7 @@ function List() {
                     icon: "success",
                     title: "Terhapus",
                     text: "Data sukses terhapus!",
-                    timer: 1000,
+                    timer: 2000,
                     showConfirmButton: false,
                 });
                 fetchData(page); // Refresh the data to reflect the deletion
@@ -153,7 +153,7 @@ function List() {
                     icon: "success",
                     title: "Success",
                     text: "Tamu sukses di tambahkan!",
-                    timer: 1000,
+                    timer: 2000,
                     showConfirmButton: false,
                 });
                 setNewGuest({nama: "", jumlah_orang: ""});
@@ -248,9 +248,6 @@ function List() {
         }
     };
 
-    // if (filteredData.length === 0 && !loading) {
-    //     return <p style={{ textAlign: "center" }}>No results found.</p>;
-    // }
     if (error) return <p style={{color: "red"}}>{error}</p>;
 
     return (
