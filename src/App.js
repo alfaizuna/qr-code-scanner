@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate, useNavigate } from "react-router-dom";
-import Home from "./screens/Home";
-import Scanner from "./screens/Scanner";
-import List from "./screens/List";
-import Login from "./screens/Login";
-import UsersTable from "./screens/UsersTable";
+import Home from "./screens/Home/Home";
+import Scanner from "./screens/Scanner/Scanner";
+import List from "./screens/ListGuest/List";
+import Login from "./screens/Login/Login";
+import UsersTable from "./screens/User/UsersTable";
 import "./App.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Swal from "sweetalert2";
