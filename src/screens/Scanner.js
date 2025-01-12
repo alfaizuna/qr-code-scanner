@@ -44,7 +44,9 @@ function Scanner() {
 
             Swal.fire("Success", response.data.message, "success").then(() => {
                 setShowModal(false);
-                navigate("/list");
+                setTimeout(() => {
+                    navigate("/list");
+                }, 500);
             });
         } catch (error) {
             console.error("Galat menyimpan data:", error);
@@ -54,7 +56,10 @@ function Scanner() {
                 "error"
             );
             setShowModal(false);
-            window.location.reload();
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
         }
     };
 
@@ -81,7 +86,9 @@ function Scanner() {
         setData("Not Found");
         setName("");
         setJumlahOrang("");
-        window.location.reload();
+        setTimeout(() => {
+            window.location.reload();
+        }, 500);
     };
 
     const handleScan = (result) => {
