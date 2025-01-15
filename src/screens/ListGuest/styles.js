@@ -1,5 +1,26 @@
 const styles = {
-    container: {padding: "20px"},
+    container: {
+        padding: "20px",
+    },
+    tableContainer: {
+        overflowX: "auto", // Enable horizontal scrolling
+        // whiteSpace: "nowrap", // Prevent table wrapping
+    },
+    table: {
+        width: "100%", // Ensure table takes full width
+        borderCollapse: "collapse",
+    },
+    th: {
+        border: "1px solid #ddd",
+        padding: "8px",
+        textAlign: "left",
+        backgroundColor: "#f2f2f2",
+    },
+    td: {
+        border: "1px solid #ddd",
+        padding: "8px",
+        textAlign: "center"
+    },
     title: {fontSize: "24px", marginBottom: "20px"},
     controls: {display: "flex", gap: "10px", marginBottom: "20px", width: "100%"},
     searchInput: {
@@ -26,9 +47,6 @@ const styles = {
         borderRadius: "5px",
         height: "40px", // Match height with the search input
     },
-    table: {width: "100%", borderCollapse: "collapse"},
-    th: {border: "1px solid #ddd", padding: "8px", backgroundColor: "#f8f9fa", textAlign: "center"},
-    td: {border: "1px solid #ddd", padding: "8px", textAlign: "center"},
     pagination: {display: "flex", justifyContent: "center", marginTop: "20px"},
     paginationButton: {padding: "10px 20px", margin: "0 5px", borderRadius: "5px"},
     pageInfo: {margin: "0 10px"},
@@ -60,11 +78,12 @@ const styles = {
         borderRadius: "5px",
     },
     modalActions: {display: "flex", justifyContent: "space-between"},
-    modalButton: {padding: "10px 20px", backgroundColor: "#28a745", color: "#fff"},
+    modalButton: {padding: "10px 20px", backgroundColor: "#28a745", color: "#fff", borderRadius: "5px"},
     modalButtonCancel: {
         padding: "10px 20px",
         backgroundColor: "#dc3545",
         color: "#fff",
+        borderRadius: "5px"
     },
     editButton: {
         padding: "5px 10px",

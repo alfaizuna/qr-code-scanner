@@ -260,7 +260,7 @@ function List() {
                     style={styles.addButton}
                     onClick={() => setIsModalOpen(true)}
                 >
-                    Tambah
+                    +
                 </button>
                 <input
                     type="text"
@@ -272,13 +272,14 @@ function List() {
             </div>
 
             {/* Table */}
+            <div style={styles.tableContainer}>
             <table style={styles.table}>
                 <thead>
                 <tr>
                     <th style={styles.th}>No</th>
                     <th style={styles.th}>Nama</th>
                     <th style={styles.th}>Jumlah Orang</th>
-                    <th style={styles.th}>Jam Kedatangan</th>
+                    <th style={styles.th}>Jam Datang</th>
                     <th style={styles.th}>Actions</th>
                 </tr>
                 </thead>
@@ -297,15 +298,16 @@ function List() {
                                 })}
                             </td>
                             <td style={styles.td}>
-                                <Dropdown>
-                                    <Dropdown.Toggle style={styles.dropdownToggle} size="sm">
+                                <Dropdown drop="down">
+                                    <Dropdown.Toggle style={styles.dropdownToggle} size="sm" className="dropdown-toggle">
                                         Actions
                                     </Dropdown.Toggle>
 
-                                    <Dropdown.Menu>
+                                    <Dropdown.Menu style={{ zIndex: 1050 }} container="body">
                                         <Dropdown.Item onClick={() => handleEditClick(item)}>
                                             Ubah
                                         </Dropdown.Item>
+                                        <Dropdown.Divider />
                                         <Dropdown.Item
                                             onClick={() =>
                                                 Swal.fire({
@@ -339,6 +341,7 @@ function List() {
                 )}
                 </tbody>
             </table>
+            </div>
 
             {filteredData.length > 0 && !loading ? (
                 <>
@@ -349,7 +352,7 @@ function List() {
                             onClick={() => handlePageChange(page - 1)}
                             disabled={page === 1}
                         >
-                            Previous
+                            &lt;&lt;
                         </button>
                         <span style={styles.pageInfo}>
                     Page {page} of {totalPages}
@@ -359,7 +362,7 @@ function List() {
                             onClick={() => handlePageChange(page + 1)}
                             disabled={page === totalPages}
                         >
-                            Next
+                            &gt;&gt;
                         </button>
                     </div>
 
@@ -391,7 +394,7 @@ function List() {
                                 style={styles.modalInput}
                             />
                             <input
-                                type="number"
+                                type="tel"
                                 placeholder="Jumlah Orang"
                                 value={newGuest.jumlah_orang}
                                 onChange={(e) =>
