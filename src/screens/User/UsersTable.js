@@ -89,6 +89,7 @@ const UsersTable = () => {
 
             const body = {
                 username,
+                role: "customer",
                 usercode, // Include usercode in the request
             };
 
