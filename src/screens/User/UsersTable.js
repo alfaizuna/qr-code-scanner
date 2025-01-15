@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import styles from "./styles";
+import Dropdown from "react-bootstrap/Dropdown";
+import axios from "axios";
 
 const UsersTable = () => {
     const [users, setUsers] = useState([]);
@@ -12,12 +14,14 @@ const UsersTable = () => {
     const [password, setPassword] = useState("");
     const [usercode, setUsercode] = useState(""); // New state for usercode
     const limit = 5;
+    const [searchTerm, setSearchTerm] = useState(""); // Search term
 
-    const fetchUsers = async (page) => {
+
+    const fetchUsers = async (page = 1) => {
         try {
             const token = localStorage.getItem("token");
             const response = await fetch(
-                `https://app-1.alfaizuna.my.id/get-users?page=${page}&limit=${limit}`,
+                `https://app-1.alfaizuna.my.id/get-users?page=${page}&limit=${limit}&name=${encodeURIComponent(searchTerm)}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -27,13 +31,23 @@ const UsersTable = () => {
 
             if (response.ok) {
                 const { data, totalPages } = await response.json();
-                setUsers(data);
-                setTotalPages(totalPages - 1);
+                setUsers(data); // Set the fetched users in the state
+                setTotalPages(totalPages); // Update totalPages without subtraction
             } else {
-                console.error("Failed to fetch users");
+                console.error("Failed to fetch users:", await response.text());
             }
         } catch (error) {
             console.error("Error fetching users:", error);
+        }
+    };
+
+    const handleSearch = async (e) => {
+        const term = e.target.value;
+        setSearchTerm(term);
+        try {
+            await fetchUsers(1);
+        } catch (err) {
+            console.error("Failed to search", err);
         }
     };
 
@@ -105,51 +119,52 @@ const UsersTable = () => {
         }
     };
 
-    const handleDeleteUser = async (id) => {
+    const handleDelete = async (id) => {
         try {
-            const result = await Swal.fire({
-                title: "Are you sure?",
-                text: "Do you want to delete this user? This action cannot be undone!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#3085d6",
-                confirmButtonText: "Yes, delete it!",
-                cancelButtonText: "Cancel",
-            });
-
-            if (result.isConfirmed) {
-                const token = localStorage.getItem("token");
-                const response = await fetch(`${process.env.REACT_APP_API_URL}/users/${id}`, {
-                    method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-
-                if (response.ok) {
-                    await Swal.fire(
-                        "Deleted!",
-                        "The user has been deleted successfully.",
-                        "success"
-                    );
-                    fetchUsers(page); // Refresh the user list
-                } else {
-                    Swal.fire("Error!", "Failed to delete user.", "error");
+            const token = localStorage.getItem("token");
+            const response = await axios.delete(
+                `${process.env.REACT_APP_API_URL}/users/${id}`,
+                {
+                    headers: {Authorization: `Bearer ${token}`},
                 }
+            );
+
+            if (response.status === 200) {
+                await Swal.fire({
+                    icon: "success",
+                    title: "Terhapus",
+                    text: "Data sukses terhapus!",
+                    timer: 2000,
+                    showConfirmButton: false,
+                });
+                fetchUsers(page); // Refresh the data to reflect the deletion
             }
-        } catch (error) {
-            Swal.fire("Error!", "An error occurred while deleting the user.", "error");
-            console.error("Error deleting user:", error);
+        } catch (err) {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: err.response?.data?.error || "Failed to delete data.",
+            });
         }
     };
 
     return (
         <div style={styles.container}>
             <h1 style={styles.title}>Customers</h1>
+            <div style={styles.controls}>
+
             <button onClick={() => openModal()} style={styles.addButton}>
-                Add Customer
+                +
             </button>
+            <input
+                type="text"
+                placeholder="Search by name..."
+                value={searchTerm}
+                onChange={handleSearch}
+                style={styles.searchInput}
+            />
+
+            </div>
             <table style={styles.table}>
                 <thead>
                 <tr>
@@ -164,12 +179,39 @@ const UsersTable = () => {
                         <td style={styles.td}>{(page - 1) * limit + index + 1}</td>
                         <td style={styles.td}>{user.username}</td>
                         <td style={styles.td}>
-                            <button
-                                onClick={() => handleDeleteUser(user.id)}
-                                style={styles.deleteButton}
-                            >
-                                Delete
-                            </button>
+                            <Dropdown drop="down">
+                                <Dropdown.Toggle style={styles.dropdownToggle} size="sm" className="dropdown-toggle">
+                                    Actions
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu style={{zIndex: 1050}} container="body">
+                                    <Dropdown.Item
+                                        // onClick={() => handleEditClick(item)}
+                                    >
+                                        Ubah
+                                    </Dropdown.Item>
+                                    <Dropdown.Divider/>
+                                    <Dropdown.Item
+                                        onClick={() =>
+                                            Swal.fire({
+                                                title: "Apakah kamu yakin?",
+                                                text: "Kamu tidak akan bisa mengembalikan aksi ini!",
+                                                icon: "warning",
+                                                showCancelButton: true,
+                                                confirmButtonColor: "#d33",
+                                                cancelButtonColor: "#3085d6",
+                                                confirmButtonText: "Ya, Hapus ini!",
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    handleDelete(user.id);
+                                                }
+                                            })
+                                        }
+                                    >
+                                        Hapus
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
                         </td>
                     </tr>
                 ))}
@@ -177,21 +219,21 @@ const UsersTable = () => {
             </table>
             <div style={styles.pagination}>
                 <button
-                    style={{ borderRadius: "5px" }}
+                    style={{borderRadius: "5px"}}
                     onClick={handlePrev}
                     disabled={page === 1}
                 >
-                    Previous
+                    &lt;&lt;
                 </button>
                 <span>
                     Page {page} of {totalPages}
                 </span>
                 <button
-                    style={{ borderRadius: "5px" }}
+                    style={{borderRadius: "5px"}}
                     onClick={handleNext}
                     disabled={page === totalPages}
                 >
-                    Next
+                    &gt;&gt;
                 </button>
             </div>
 

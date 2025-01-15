@@ -1,8 +1,35 @@
 const styles = {
-    container: { padding: "20px" },
+    container: {
+        padding: "20px",
+    },
+    tableContainer: {
+        overflowX: "auto", // Enable horizontal scrolling
+        // whiteSpace: "nowrap", // Prevent table wrapping
+    },
+    table: {
+        width: "100%", // Ensure table takes full width
+        borderCollapse: "collapse",
+    },
+    th: {
+        border: "1px solid #ddd",
+        padding: "8px",
+        textAlign: "center",
+        backgroundColor: "#f2f2f2",
+    },
+    td: {
+        border: "1px solid #ddd",
+        padding: "8px",
+        textAlign: "center"
+    },
     title: { fontSize: "24px", marginBottom: "20px" },
-    addButton: { padding: "10px", backgroundColor: "green", color: "#fff", border: "none", cursor: "pointer", borderRadius: "5px", marginBottom:"20px"},
-    table: { width: "100%", borderCollapse: "collapse" },
+    addButton: {
+        padding: "5px 20px",
+        backgroundColor: "#28a745",
+        color: "#fff",
+        border: "none",
+        borderRadius: "5px",
+        height: "40px", // Match height with the search input
+    },
     actions: { display: "flex", gap: "10px", border: "1px solid #ddd", padding: "12px", textAlign: "center" },
     editButton: { backgroundColor: "blue", color: "#fff", padding: "5px", cursor: "pointer" },
     deleteButton: { backgroundColor: "red", color: "#fff", padding: "5px", cursor: "pointer" },
@@ -58,16 +85,12 @@ const styles = {
         border: "none",
         cursor: "pointer",
     },
-    th: {
-        backgroundColor: "#f8f9fa",
-        fontWeight: "bold",
-        border: "1px solid #ddd",
+    searchInput: {
         padding: "8px",
+        border: "1px solid #ccc",
+        borderRadius: "5px",
+        flex: "1",
     },
-    td: {
-        border: "1px solid #ddd",
-        padding: "8px",
-        textAlign: "center",
-    },
+    controls: {display: "flex", gap: "10px", marginBottom: "20px", width: "100%"},
 };
 export default styles;
