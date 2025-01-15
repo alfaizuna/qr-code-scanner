@@ -83,39 +83,54 @@ const UsersTable = () => {
         try {
             const token = localStorage.getItem("token");
             const url = editUser
-                ? `${process.env.REACT_APP_API_URL}/update-user/${editUser.id}`
-                : `${process.env.REACT_APP_API_URL}/register`;
+                ? `${process.env.REACT_APP_API_URL}/update-user/${editUser.id}` // For update
+                : `${process.env.REACT_APP_API_URL}/register`; // For creating a new user
             const method = editUser ? "PUT" : "POST";
 
             const body = {
                 username,
-                role: "customer", // Role is fixed to "customer" based on your UI logic
-                usercode, // Use the input value for usercode
+                usercode, // Include usercode in the request
             };
 
             if (!editUser || password.trim() !== "") {
-                body.password = password; // Include password only if provided
+                body.password = password; // Include password if provided
             }
 
-            const response = await fetch(url, {
+            const response = await axios({
+                url,
                 method,
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify(body),
+                data: body,
             });
 
-            if (response.ok) {
-                fetchUsers(page);
-                closeModal();
+            if (response.status === 200 || response.status === 201) {
+                fetchUsers(page); // Refresh the user list
+                closeModal(); // Close the modal
+                await Swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: editUser ? "User updated successfully!" : "User added successfully!",
+                    timer: 2000,
+                    showConfirmButton: false,
+                });
             } else {
-                const errorData = await response.json();
-                console.error("Error saving user:", errorData.error);
-                alert(`Failed to save user: ${errorData.error}`);
+                console.error("Failed to save user:", response.data);
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: response.data?.error || "An error occurred while saving the user.",
+                });
             }
         } catch (error) {
             console.error("Error saving user:", error);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: error.response?.data?.error || "An unexpected error occurred.",
+            });
         }
     };
 
@@ -186,7 +201,7 @@ const UsersTable = () => {
 
                                 <Dropdown.Menu style={{zIndex: 1050}} container="body">
                                     <Dropdown.Item
-                                        // onClick={() => handleEditClick(item)}
+                                        onClick={() => openModal(user)}
                                     >
                                         Ubah
                                     </Dropdown.Item>
@@ -240,7 +255,7 @@ const UsersTable = () => {
             {modalVisible && (
                 <div style={styles.modalOverlay}>
                     <div style={styles.modal}>
-                        <h2>{editUser ? "Edit User" : "Add Customer"}</h2>
+                        <h2>{editUser ? "Edit Customer" : "Add Customer"}</h2>
                         <input
                             type="text"
                             placeholder="Nama undangan"
