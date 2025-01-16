@@ -81,6 +81,34 @@ const UsersTable = () => {
 
     const handleSaveUser = async () => {
         try {
+            // Validate required fields
+            if (!username || username.trim() === "") {
+                await Swal.fire({
+                    icon: "error",
+                    title: "Validation Error",
+                    text: "Username is required.",
+                });
+                return; // Exit the function if validation fails
+            }
+
+            if (!usercode || usercode.trim() === "") {
+                await Swal.fire({
+                    icon: "error",
+                    title: "Validation Error",
+                    text: "Nama undangan is required.",
+                });
+                return; // Exit the function if validation fails
+            }
+
+            if (!editUser && (!password || password.trim() === "")) {
+                await Swal.fire({
+                    icon: "error",
+                    title: "Validation Error",
+                    text: "Password is required for new customer.",
+                });
+                return; // Exit the function if validation fails
+            }
+
             const token = localStorage.getItem("token");
             const url = editUser
                 ? `${process.env.REACT_APP_API_URL}/update-user/${editUser.id}` // For update
