@@ -21,7 +21,7 @@ const UsersTable = () => {
         try {
             const token = localStorage.getItem("token");
             const response = await fetch(
-                `https://app-1.alfaizuna.my.id/get-users?page=${page}&limit=${limit}&name=${encodeURIComponent(searchTerm)}`,
+                `${process.env.REACT_APP_API_URL}/get-users?page=${page}&limit=${limit}&name=${encodeURIComponent(searchTerm)}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

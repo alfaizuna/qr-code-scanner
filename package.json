@@ -49,5 +49,5 @@
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "react-qr-barcode-scanner": "^2.0.0"
   },
-  "proxy": "https://app-1.alfaizuna.my.id"
+  "proxy": "https://qr-backend.galipat-story.com"
 }
