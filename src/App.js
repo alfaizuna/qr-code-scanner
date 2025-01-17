@@ -1,21 +1,35 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate, useNavigate } from "react-router-dom";
-import Home from "./screens/Home";
-import Scanner from "./screens/Scanner";
-import List from "./screens/List";
-import Login from "./screens/Login";
-import UsersTable from "./screens/UsersTable";
+import Home from "./screens/Home/Home";
+import Scanner from "./screens/Scanner/Scanner";
+import List from "./screens/ListGuest/List";
+import Login from "./screens/Login/Login";
+import UsersTable from "./screens/User/UsersTable";
 import "./App.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Swal from "sweetalert2";
 
 function App() {
     const [token, setToken] = useState(localStorage.getItem("token") || null);
     const [role, setRole] = useState(localStorage.getItem("role") || null);
 
     const handleLogout = () => {
-        setToken(null);
-        setRole(null);
-        localStorage.removeItem("token");
-        localStorage.removeItem("role");
+        Swal.fire({
+            title: "Apakah Anda yakin?",
+            text: "Anda akan keluar dari aplikasi.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Ya, keluar",
+            cancelButtonText: "Batal",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                setToken(null);
+                setRole(null);
+                localStorage.removeItem("token");
+                localStorage.removeItem("role");
+                Swal.fire("Berhasil!", "Anda telah keluar.", "success");
+            }
+        });
     };
 
     if (!token) {

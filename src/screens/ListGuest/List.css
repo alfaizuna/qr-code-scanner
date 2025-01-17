@@ -16,6 +16,10 @@ th {
     background-color: #f8f9fa;
 }
 
+.dropdown-menu {
+    position: absolute !important;
+}
+
 /* Responsive styles */
 @media screen and (max-width: 600px) {
     table,
